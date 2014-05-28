@@ -1,0 +1,18 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title= locals.title
+    meta(name='viewport' content='user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1')
+    link(rel='stylesheet', href='/style/style.css')
+    script(src='/vendor/two/build/two.js')
+    script(src='/vendor/gyes/gyes.js')
+  body
+    #container
+      block content
+
+    script(src='/vendor/hapticMD/HapticModalityDriver.js')
+    script(src='/js/shapes.js')
+    script(src='/js/main.js')
+
+

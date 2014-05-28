@@ -1,0 +1,27 @@
+{
+  "name": "shapes_app",
+  "version": "0.0.0",
+  "authors": [
+    "Diego Paez <paez.di@gmail.com>"
+  ],
+  "description": "A plusultra demo app.",
+  "main": "app.js",
+  "keywords": [
+    "demo",
+    "multimodal",
+    "plusultra"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "two": "~0.3.0"
+  }
+}
