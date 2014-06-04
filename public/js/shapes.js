@@ -67,13 +67,13 @@ var ShapesApp = (function( two, gyes, doc, HapticMD ){
     _gestureInterpretation.canSynthetize( hapticMod.name, hapticDriver.getID(), 2000 );
 
     // create a fusion module
-    _fusion = new gyes.Fusion();
+    _fusion = new gyes.Fusion( {'verbose':true} );
     // listen for some events
     _fusion.fuse( _gestureInterpretation );
     // create a fission module
     _fission = new gyes.Fission();
     // listen for interpretation to happen
-    _fission.on( _gestureInterpretation.getName(), function( data ){
+    _fission.on( _gestureInterpretation.getName(), function(data){
       console.log( 'A new interpretation happened: ', data );
 
       var temp = _rect.fill;
@@ -84,6 +84,17 @@ var ShapesApp = (function( two, gyes, doc, HapticMD ){
         _rect.fill = temp;
       }, 2000);
 
+    });
+
+    var gestElem = doc.getElementsByClassName('data-indicator')[0];
+    var gestName = doc.getElementsByClassName('data-label')[0];
+    _fusion.on( 'fusion::onSignal', function(data){
+      gestElem.classList.add( 'highlight' );
+      gestName.textContent = data.gesture;
+      setTimeout(function(){
+        gestElem.classList.remove( 'highlight' );
+        gestName.textContent = '';
+      }, 2000);
     });
 
   }
