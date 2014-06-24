@@ -5,8 +5,6 @@ html(lang='en')
     title= locals.title
     meta(name='viewport' content='user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1')
     link(rel='stylesheet', href='/style/style.css')
-    script(src='/vendor/two/build/two.js')
-    script(src='/vendor/gyes/gyes.js')
   body
     #container
       block content
@@ -14,7 +12,12 @@ html(lang='en')
     #extra
       include extra
 
+    //script(src='/vendor/draggabilly/draggabilly.js')
+    script(src='/vendor/gyes/gyes.js')
+    script(src='/vendor/interact.js/interact.js')
+    script(src='/js/interactive.js')
     script(src='/vendor/hapticMD/HapticModalityDriver.js')
+    script(src='/vendor/airPointerMD/AirPointerDriver.js')
     script(src='/js/shapes.js')
     script(src='/js/main.js')
 

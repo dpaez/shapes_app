@@ -1,40 +1,65 @@
-var ShapesApp = (function( two, gyes, doc, HapticMD ){
+/**
+ * File: shapes.js
+ * Deps: Gyes, DOM, HapticModuleDriver
+ *
+ * Description: A "mini" game multimodality demo app.
+ */
 
+var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
+  // ***
   // Private module implementation
+  // ***
   var self = this,
-    _two = null,
-    _rect = null,
-    _rectHome = null,
-    _body,
-    _elem,
     _client,
     _fission,
-    _fusion;
+    _fusion,
+    elem;
+
 
   function _init(){
     console.log( 'INITIALIAZING SHAPES APP...' );
+    // *** Set up interactive.js ***
+    interactive.draggables( '.draggable' );
+    interactive.droppables( '.droppable', { 'accept':'.draggable' } );
 
-    // hardcoded
-
-    _body = doc.body;
-    // SETUP TWO STUFF
-    _two = new Two({
-      fullscreen: true,
-      autostart: true
+    document.addEventListener('fingerdown', function( ev ){
+      console.log( 'finger is down! - ', ev );
     });
 
-    _two.appendTo( _body );
+    document.addEventListener('fingermove', function( ev ){
+      var target = ev.target;
 
-    _rect = _two.makeRectangle( _two.width / 4, _two.height / 4, 50 ,50 );
-    _rectHome = _two.makeRectangle( _two.width / 1.5, _two.height / 4, 50 ,50 );
-    _rectHome.fill = 'black';
+      if ( (!target) || (!target.classList.contains( 'draggable' )) ){
+        return;
+      }
 
-    _two.update();
+      if ( ev.detail ){
+        ev.dx = parseInt( ev.detail.dx ) - target.offsetLeft;
+        ev.dy = parseInt( ev.detail.dy ) - target.offsetTop;
+      }
 
-    _elem = doc.getElementById( 'two-1' );
-    _elemHome = doc.getElementById( 'two-2' ); //doc.getElementsByClassName( 'rectHome' )[0];
+      console.log( 'dx: ', ev.dx );
+      console.log( 'dy: ', ev.dy );
 
+      target.x = (( target.x|0 ) + ev.dx );
+      target.y = (( target.y|0 ) + ev.dy );
+      console.log( 'target.x: ', target.x );
+      console.log( 'target.y: ', target.y );
+
+      target.style.top = target.y + 'px';
+      target.style.left = target.x + 'px';
+
+      //target.style.webkitTransform = target.style.transform =
+      //'translate(' + target.x + 'px, ' + target.y + 'px)';
+    });
+
+    document.addEventListener('fingerup', function( ev ){
+      //target = undefined;
+    });
+
+    // ***
     // SETUP GYES STUFF
+    // ***
     var socketURI = 'ws://0.0.0.0:26060';
     var options ={
       // transports: ['websocket'],
@@ -48,19 +73,29 @@ var ShapesApp = (function( two, gyes, doc, HapticMD ){
 
     // *** Creating a new modality ***
 
+    var airMod = new gyes.Modality( 'airGestures', 'input', {} );
+    var width = isNaN(window.innerWidth) ? doc.clientWidth : window.innerWidth;
+    var height = isNaN(window.innerHeight) ? doc.clientHeight : window.innerHeight;
+
+    var airDriver = new AirPointerMD( width, height );
+    airMod.use( airDriver );
+    _client.addModality( app_key, airMod );
+
+    // *** Creating a new modality ***
+
     var hapticMod = new gyes.Modality( 'webHaptic', 'both', {} );
     var driverOptions = {
       'hapticEvents': [ 'touch, hold' ],
-      'element': _elem
+      'element': null
     };
 
     var hapticDriver = new HapticMD( driverOptions );
-
     hapticMod.use( hapticDriver );
-
     _client.addModality( app_key, hapticMod );
 
-    // *** Interpretation, Fusion & the Fission ***
+    // ***
+    // Interpretation, Fusion & the Fission
+    // ***
 
     // swipe is the modality signal that is dispatched through the (Leap) Modality Driver
     _gestureInterpretation = new gyes.Interpretation( ['swipe', 'hold'] );
@@ -76,13 +111,6 @@ var ShapesApp = (function( two, gyes, doc, HapticMD ){
     _fission.on( _gestureInterpretation.getName(), function(data){
       console.log( 'A new interpretation happened: ', data );
 
-      var temp = _rect.fill;
-
-      _rect.fill = 'green';
-
-      setTimeout(function(){
-        _rect.fill = temp;
-      }, 2000);
 
     });
 
@@ -99,21 +127,9 @@ var ShapesApp = (function( two, gyes, doc, HapticMD ){
 
   }
 
-  function _defaultFn( e ){
-
-    e.gesture.stopPropagation();
-    e.gesture.preventDefault();
-    e.stopPropagation();
-    e.preventDefault();
-    var target = e.gesture.target;
-    var x = parseInt(e.gesture.deltaX);
-    var y = parseInt(e.gesture.deltaY);
-    _rect.translation.set( x, y );
-    //target.style.top = x + 'px';
-    //target.style.left = y + 'px';
-
-  }
+  // ***
   // Public API
+  // ***
 
   function publicInit(){
     _init();
@@ -123,4 +139,4 @@ var ShapesApp = (function( two, gyes, doc, HapticMD ){
     initialize: publicInit
   };
 
-})( Two, gyes, document, HapticModalityDriver );
+})( InteractiveApp, gyes, document, HapticModalityDriver, AirPointerModalityDriver );

@@ -1,3 +1,6 @@
+/**
+ * General styles
+ */
 
 body
   font-size: 100%
@@ -15,6 +18,10 @@ body
 #container
   width: 100%
   height: 920px
+
+/**
+ * Structural & Positioning styles
+ */
 
 #forms
   background-color: #54E6DD
@@ -35,9 +42,50 @@ body
   width: 49%
   display: inline-block
 
-.rect
-  width: 10%
-  height: 10%
+.itemlist div
+  text-align: center
+
+#forms .circle
+  position: absolute
+  top: 10%
+  left: 20%
+
+#forms .square
+  position: absolute
+  top: 15%
+  left: 20%
+
+#forms .plus-sign
+  position: absolute
+  top: 67%
+  left: 22%
+
+#shapes .square
+  position: absolute
+  top: 15%
+  right: 20%
+
+#shapes .circle
+  position: absolute
+  top: 10%
+  right: 20%
+
+#shapes .plus-sign
+  position: absolute
+  top: 67%
+  right: 22%
+
+
+.itemlist div:first-child
+  margin-top: 10%
+
+.itemlist div:last-child
+  margin-bottom: 0
+
+
+/**
+ * Visor style -- To be splitted out
+ */
 
 #extra
   position: relative
@@ -78,10 +126,8 @@ body
 .highlight
   background-color: yellow
 
-
-
-
 /* ** Effects ** */
+
 .animated
   -webkit-animation-duration: 1s
   animation-duration: 1s
@@ -172,3 +218,62 @@ body
 .wobble
   -webkit-animation-name: wobble
   animation-name: wobble
+
+/**
+ * Shapes styles
+ */
+
+.itemlist.home > div
+  opacity: 0.6
+  border-width: 6px
+  border-style: inset
+
+.itemlist.home .plus-sign:before
+  opacity: 0.9
+  border-width: 6px
+  border-style: inset
+  top: 30px
+  left:-39px
+
+
+.square
+  width: 140px
+  height: 140px
+  border: 6px outset #08A7EA
+  background-color: #08A7EA
+
+.circle
+  width: 140px
+  height: 140px
+  border: 6px outset #E03636
+  background-color: #E03636
+  -moz-border-radius: 70px
+  -webkit-border-radius: 70px
+  border-radius: 70px
+
+.plus-sign
+  border: 6px outset #2AC746
+  background-color: #2AC746
+  width:33px
+  height:100px
+  margin-left:39px
+
+.plus-sign:before
+  content:""
+  border: 6px outset #2AC746
+  background-color: #2AC746
+  z-index: 100
+  width:100px
+  height:33px
+  position:absolute
+  top:30px
+  left:-39px
+
+/**
+ * InteractiveApp styles
+ */
+
+.onDropZone, .onDropZone:before
+  opacity: 1
+  background-color: purple
+

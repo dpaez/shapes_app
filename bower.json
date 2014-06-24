@@ -22,6 +22,6 @@
     "tests"
   ],
   "dependencies": {
-    "two": "~0.3.0"
+    "interact.js": "~1.0.17"
   }
 }
