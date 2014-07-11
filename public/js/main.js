@@ -1,5 +1,6 @@
-(function( app ){
+(function( app, visor ){
 
   app.initialize();
+  visor.start();
 
-}( ShapesApp ));
+}( ShapesApp, Visor ));

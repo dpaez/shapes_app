@@ -6,6 +6,7 @@
 var express = require('express');
 var jade = require('jade');
 var stylus = require('stylus');
+var nib = require('nib');
 
 /**
  * Module locals
@@ -21,7 +22,8 @@ var pub = __dirname + '/public';
 function compile(str, path){
   return stylus(str)
   .set('filename', path)
-  .set('compress', true);
+  .set('compress', true)
+  .use(nib());
 }
 
 app.use( stylus.middleware({

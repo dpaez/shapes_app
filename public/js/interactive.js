@@ -6,15 +6,14 @@ var InteractiveApp = (function( interact ){
 
     target.x = (target.x|0) + event.dx;
     target.y = (target.y|0) + event.dy;
-    console.log( event.dx );
-    console.log( event.dy );
 
     target.style.left = target.x + 'px';
     target.style.top = target.y + 'px';
-    /*target.style.webkitTransform = target.style.transform =
-    'translate(' + target.x + 'px, ' + target.y + 'px)';*/
+    target.style.webkitTransform = target.style.transform =
+    'translate(' + target.x + 'px, ' + target.y + 'px)';
 
-    target.textContent = 'x: ' + target.x + ' y: ' + target.y;
+    console.log( 'x: ', target.x );
+    console.log( 'y: ', target.y );
   }
 
   function defaultDragEnter( event ){

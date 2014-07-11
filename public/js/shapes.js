@@ -22,14 +22,17 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     interactive.draggables( '.draggable' );
     interactive.droppables( '.droppable', { 'accept':'.draggable' } );
 
-    document.addEventListener('fingerdown', function( ev ){
+    // TODO:replicate interactive api
+    document.addEventListener( 'fingerdown', function( ev ){
       console.log( 'finger is down! - ', ev );
     });
 
-    document.addEventListener('fingermove', function( ev ){
+    document.addEventListener( 'fingermove', function( ev ){
       var target = ev.target;
-
-      if ( (!target) || (!target.classList.contains( 'draggable' )) ){
+      var min = Math.min;
+      var max = Math.max;
+      console.info( 'fingermove::ev ', ev );
+      if ( !target || !target.classList.contains('draggable') ){
         return;
       }
 
@@ -41,20 +44,35 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       console.log( 'dx: ', ev.dx );
       console.log( 'dy: ', ev.dy );
 
-      target.x = (( target.x|0 ) + ev.dx );
-      target.y = (( target.y|0 ) + ev.dy );
+      //target.x = (( target.x|0 ) + ev.dx );
+      target.x = ev.dx - (22*4);
+
+      //target.y = (( target.y|0 ) + ev.dy );
+      target.y = ev.dy - (22*4);
+
       console.log( 'target.x: ', target.x );
       console.log( 'target.y: ', target.y );
 
       target.style.top = target.y + 'px';
       target.style.left = target.x + 'px';
 
-      //target.style.webkitTransform = target.style.transform =
-      //'translate(' + target.x + 'px, ' + target.y + 'px)';
+      target.style.webkitTransform = target.style.transform =
+      'translate(' + target.x + 'px, ' + target.y + 'px)';
     });
 
-    document.addEventListener('fingerup', function( ev ){
+    document.addEventListener( 'fingerup', function( ev ){
       //target = undefined;
+    });
+
+    document.addEventListener( 'fingerenter',function( ev ){
+      var target = ev.target;
+      console.info( 'fingerenter::target ', target );
+      target.classList.add( 'onDropZone' );
+    });
+
+    document.addEventListener( 'fingerleave', function( ev ){
+      var target = ev.target;
+      target.classList.remove( 'onDropZone' );
     });
 
     // ***
@@ -76,7 +94,10 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var airMod = new gyes.Modality( 'airGestures', 'input', {} );
     var width = isNaN(window.innerWidth) ? doc.clientWidth : window.innerWidth;
     var height = isNaN(window.innerHeight) ? doc.clientHeight : window.innerHeight;
-
+    var airOptions = {
+      width: width,
+      height: height
+    };
     var airDriver = new AirPointerMD( width, height );
     airMod.use( airDriver );
     _client.addModality( app_key, airMod );
@@ -86,7 +107,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var hapticMod = new gyes.Modality( 'webHaptic', 'both', {} );
     var driverOptions = {
       'hapticEvents': [ 'touch, hold' ],
-      'element': null
+      'element': doc.getElementById('shapes')//'.droppable'
     };
 
     var hapticDriver = new HapticMD( driverOptions );
@@ -97,8 +118,8 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     // Interpretation, Fusion & the Fission
     // ***
 
-    // swipe is the modality signal that is dispatched through the (Leap) Modality Driver
-    _gestureInterpretation = new gyes.Interpretation( ['swipe', 'hold'] );
+    // fingerover is the modality signal that is dispatched through the (Leap) AirGestures
+    _gestureInterpretation = new gyes.Interpretation( ['fingerover', 'hold'] );
     _gestureInterpretation.canSynthetize( hapticMod.name, hapticDriver.getID(), 2000 );
 
     // create a fusion module
@@ -108,20 +129,31 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     // create a fission module
     _fission = new gyes.Fission();
     // listen for interpretation to happen
-    _fission.on( _gestureInterpretation.getName(), function(data){
-      console.log( 'A new interpretation happened: ', data );
-
-
-    });
 
     var gestElem = doc.getElementsByClassName('data-indicator')[0];
     var gestName = doc.getElementsByClassName('data-label')[0];
+    var gestData = doc.querySelector('.gesture-data');
+    var gestDataText = gestData.querySelector( 'h3' );
     _fusion.on( 'fusion::onSignal', function(data){
       gestElem.classList.add( 'highlight' );
       gestName.textContent = data.gesture;
       setTimeout(function(){
         gestElem.classList.remove( 'highlight' );
         gestName.textContent = '';
+      }, 2000);
+    });
+
+    _fission.on( _gestureInterpretation.getName(), function(data){
+      console.log( 'A new interpretation happened: ', data );
+      gestName.textContent = '';
+      gestElem.classList.remove( 'highlight' );
+      gestDataText.classList.remove( 'invisible' );
+      gestDataText.textContent = 'FISION';
+      gestData.classList.add( 'highlight' );
+      setTimeout(function(){
+        gestDataText.classList.add( 'invisible' );
+        gestData.classList.remove( 'highlight' );
+        gestDataText.textContent = '';
       }, 2000);
     });
 
