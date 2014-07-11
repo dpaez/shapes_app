@@ -22,10 +22,11 @@ body
   margin: 0
   color: #2B2B2B
   background-color: #666666
+  height: 100%
 
 #container
   width: 100%
-  height: 920px
+  height: 100%
 
 /**
  * Structural & Positioning styles
@@ -128,7 +129,7 @@ body
   float: right
   margin-left: 2%
   margin-right: 2%
-  margin-top: -5%
+  margin-top: 60%
   z-index: 100
 
 .statusEnabled
@@ -268,4 +269,46 @@ body
 .onDropZone, .onDropZone:before
   opacity: 1
   background-color: purple
+
+
+/**
+ * Media Queries
+ */
+
+@media (max-width: 960px)
+  .itemlist > div
+    font-size: 9em
+    width: 1em
+    height: 162px
+    text-align: center
+
+  #extra
+    margin-top: 68%
+
+@media (max-width: 800px)
+  #extra
+    margin-top: 75%
+
+@media handheld, (max-width: 750px)
+  .itemlist > div
+    font-size: 7em
+    width: 1em
+    height: 122px
+    margin-bottom: 5px
+    text-align: center
+
+  #shapes
+    width: 98%
+    height: 98%
+    left: 0
+
+  #forms
+    height: 98%
+    left: -60%
+    right: 100%
+
+
+  .lightbox
+    display: none
+    visibility: hidden
 
