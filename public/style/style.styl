@@ -35,7 +35,7 @@ body
 .lightbox
   position: absolute
   width: 10%
-  height: 10%
+  height: 1.5em
   top: 10%
   right: 2%
   background-color: #5f77cc
@@ -47,6 +47,9 @@ body
   text-align: center
   padding: 2px 0
 
+.lightbox checkbox
+  line-height: 1.5em
+
 .lightbox label
   display: inline-block
   text-align: left
@@ -55,6 +58,7 @@ body
 .lightbox input
   display: inline-block
   text-align: right
+  vertical-align: middle
 
 #forms
   position: absolute
@@ -83,7 +87,7 @@ body
   left: 50%
   right: 0
   font-family: "Dingbat"
-  background-color: #4b1e1c
+  background-color: #5C3230 //#4b1e1c
   border-width: 2px
   border-style: outset
   border-color: #4b1e1c
@@ -91,21 +95,35 @@ body
   margin: 10px
   text-align: center
 
+
 .itemlist
   padding-left: 36%
 
 .itemlist > div
+  display: block
+  padding: 0
+  margin: 0
+  vertical-align: middle
   font-size: 15em
+  line-height: 1.1em
   width: 1em
-  height: 182px
+  height: 1em
+  margin-bottom: 3%
   text-align: center
 
-.item
-  color: #4dc668//#1650EE
+.itemlist.home > div
+  border-width: 2px
+  border-style: solid
+  border-radius: 20px
 
+.item
+  color: #4dc668 //#1650EE
+  text-shadow: 0px 1px 0px #5ecb77, 0px 2px 0px #70d186 //, 0px 3px 0px #82d795, 0px 4px 0px #94dca4, 0px 5px 0px #a6e2b3, 0px 6px 0px
 
 .item-off
-  color: #57c5b7 //#CFD4EB
+  color: rgba(75,30,28, 0.8) //#5C3230 //#57c5b7 //#CFD4EB
+  //text-shadow:  0 0.1em 0.1em #816160, 0 0 0 #000
+  text-shadow: 1px 4px 6px #816160, 0 0 0 #000, 1px 4px 6px #816160
 
 
 .itemlist div:first-child
@@ -120,16 +138,15 @@ body
  */
 
 #extra
-  position: relative
+  position: fixed
   width: 96%
   height: 3em
+  bottom: 2%
+  right: 2%
+  left: 2%
   background-color: #14A62A
   border: 3px solid #4DBACD
   border-radius: 10px
-  float: right
-  margin-left: 2%
-  margin-right: 2%
-  margin-top: 60%
   z-index: 100
 
 .statusEnabled
@@ -256,17 +273,12 @@ body
   -webkit-animation-name: wobble
   animation-name: wobble
 
-.itemlist.home > div
-  opacity: 0.6
-  border-width: 6px
-  border-style: inset
-
 
 /**
  * InteractiveApp styles
  */
 
-.onDropZone, .onDropZone:before
+.onDropZone, .onDropZone:before, .onDropZone:active
   opacity: 1
   background-color: purple
 
@@ -282,14 +294,14 @@ body
     height: 162px
     text-align: center
 
-  #extra
-    margin-top: 68%
-
-@media (max-width: 800px)
-  #extra
-    margin-top: 75%
 
 @media handheld, (max-width: 750px)
+  body
+    overflow-x: hidden
+
+  .itemlist
+    padding-left: 31%
+
   .itemlist > div
     font-size: 7em
     width: 1em
@@ -298,9 +310,9 @@ body
     text-align: center
 
   #shapes
-    width: 98%
+    width: 100%
     height: 98%
-    left: 0
+    left: -2%
 
   #forms
     height: 98%
@@ -312,3 +324,26 @@ body
     display: none
     visibility: hidden
 
+@media handheld, (max-height: 480px)
+  body
+    overflow-x: hidden
+    overflow-y: hidden
+
+  #shapes
+    width: 100%
+    height: 98%
+    margin: 0
+    left: 0
+    right: 0
+    bottom: 0
+    top: 0
+
+  .itemlist
+    padding-left: 36%
+
+  .itemlist > div
+    font-size: 6em
+    width: 1em
+    height: 75px
+    margin-bottom: 15px
+    text-align: center

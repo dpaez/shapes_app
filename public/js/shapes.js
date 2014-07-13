@@ -22,12 +22,14 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     interactive.draggables( '.draggable' );
     interactive.droppables( '.droppable', { 'accept':'.draggable' } );
 
-    // TODO:replicate interactive api
+    // Setup AirPointerDriver events hooks
+    // TODO: separate this, do something like replicate interactive api
     document.addEventListener( 'fingerdown', function( ev ){
       console.log( 'finger is down! - ', ev );
     });
 
-    document.addEventListener( 'fingermove', function( ev ){
+    var fingerDraggable = document.querySelector( '.draggable' ).parentElement;
+    fingerDraggable.addEventListener( 'fingermove', function( ev ){
       var target = ev.target;
       var min = Math.min;
       var max = Math.max;
@@ -41,17 +43,11 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
         ev.dy = parseInt( ev.detail.dy ) - target.offsetTop;
       }
 
-      console.log( 'dx: ', ev.dx );
-      console.log( 'dy: ', ev.dy );
-
       //target.x = (( target.x|0 ) + ev.dx );
       target.x = ev.dx - (22*4);
 
       //target.y = (( target.y|0 ) + ev.dy );
       target.y = ev.dy - (22*4);
-
-      console.log( 'target.x: ', target.x );
-      console.log( 'target.y: ', target.y );
 
       target.style.top = target.y + 'px';
       target.style.left = target.x + 'px';
@@ -64,14 +60,16 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       //target = undefined;
     });
 
-    document.addEventListener( 'fingerenter',function( ev ){
-      var target = ev.target;
+    var fingerDroppable = document.querySelector( '.droppable' ).parentElement;
+    fingerDroppable.addEventListener( 'fingerenter',function( ev ){
+      var target = ev.srcElement;
       console.info( 'fingerenter::target ', target );
       target.classList.add( 'onDropZone' );
     });
 
-    document.addEventListener( 'fingerleave', function( ev ){
-      var target = ev.target;
+    fingerDroppable.addEventListener( 'fingerleave', function( ev ){
+      var target = ev.srcElement;
+      console.info( 'fingerenter::target ', target );
       target.classList.remove( 'onDropZone' );
     });
 
