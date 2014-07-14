@@ -29,7 +29,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     });
 
     var fingerDraggable = document.querySelector( '.draggable' ).parentElement;
-    fingerDraggable.addEventListener( 'fingermove', function( ev ){
+    document.addEventListener( 'fingermove', function( ev ){
       var target = ev.target;
       var min = Math.min;
       var max = Math.max;
@@ -128,11 +128,12 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     _fission = new gyes.Fission();
     // listen for interpretation to happen
 
-    var gestElem = doc.getElementsByClassName('data-indicator')[0];
-    var gestName = doc.getElementsByClassName('data-label')[0];
+    var gestElem = doc.querySelector('.data-indicator');
+    var gestName = doc.querySelector('.data-label');
     var gestData = doc.querySelector('.gesture-data');
     var gestDataText = gestData.querySelector( 'h3' );
     _fusion.on( 'fusion::onSignal', function(data){
+      console.log('doing fusion');
       gestElem.classList.add( 'highlight' );
       gestName.textContent = data.gesture;
       setTimeout(function(){
