@@ -24,12 +24,12 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
     // Setup AirPointerDriver events hooks
     // TODO: separate this, do something like replicate interactive api
-    document.addEventListener( 'fingerdown', function( ev ){
+    doc.addEventListener( 'fingerdown', function( ev ){
       console.log( 'finger is down! - ', ev );
     });
 
-    var fingerDraggable = document.querySelector( '.draggable' ).parentElement;
-    document.addEventListener( 'fingermove', function( ev ){
+    var fingerDraggable = doc.querySelector( '.draggable' ).parentElement;
+    doc.addEventListener( 'fingermove', function( ev ){
       var target = ev.target;
       var min = Math.min;
       var max = Math.max;
@@ -56,19 +56,20 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       'translate(' + target.x + 'px, ' + target.y + 'px)';
     });
 
-    document.addEventListener( 'fingerup', function( ev ){
+    doc.addEventListener( 'fingerup', function( ev ){
       //target = undefined;
+      console.log( 'finger is up! - ', ev );
     });
 
-    var fingerDroppable = document.querySelector( '.droppable' ).parentElement;
-    fingerDroppable.addEventListener( 'fingerenter',function( ev ){
-      var target = ev.srcElement;
+    var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
+    fingerDroppable.addEventListener( 'fingerenter', function( ev ){
+      var target = ev.target;
       console.info( 'fingerenter::target ', target );
       target.classList.add( 'onDropZone' );
     });
 
     fingerDroppable.addEventListener( 'fingerleave', function( ev ){
-      var target = ev.srcElement;
+      var target = ev.target;
       console.info( 'fingerenter::target ', target );
       target.classList.remove( 'onDropZone' );
     });
@@ -132,12 +133,19 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var gestName = doc.querySelector('.data-label');
     var gestData = doc.querySelector('.gesture-data');
     var gestDataText = gestData.querySelector( 'h3' );
+    var fussionEl;
     _fusion.on( 'fusion::onSignal', function(data){
       console.log('doing fusion');
-      gestElem.classList.add( 'highlight' );
+      gestName.textContent = '';
+      gestElem.classList.remove( 'highlight' );
       gestName.textContent = data.gesture;
+      gestElem.classList.add( 'highlight' );
+
+      fussionEl = doc.getElementById( data.elementID );
+      fussionEl.classList.add( 'onDropZone' );
       setTimeout(function(){
         gestElem.classList.remove( 'highlight' );
+        fussionEl.classList.remove( 'onDropZone' );
         gestName.textContent = '';
       }, 2000);
     });
