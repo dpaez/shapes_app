@@ -56,21 +56,22 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       'translate(' + target.x + 'px, ' + target.y + 'px)';
     });
 
-    doc.addEventListener( 'fingerup', function( ev ){
-      //target = undefined;
-      console.log( 'finger is up! - ', ev );
-    });
-
     var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
     fingerDroppable.addEventListener( 'fingerenter', function( ev ){
       var target = ev.target;
-      console.info( 'fingerenter::target ', target );
+      var src = ev.detail.src;
+      if ( src.innerText === target.innerText ){
+        target.classList.add( 'match' );
+        setTimeout(function(){
+          target.classList.remove( 'match' );
+        }, 2000);
+      }
       target.classList.add( 'onDropZone' );
     });
 
     fingerDroppable.addEventListener( 'fingerleave', function( ev ){
       var target = ev.target;
-      console.info( 'fingerenter::target ', target );
+
       target.classList.remove( 'onDropZone' );
     });
 
@@ -78,7 +79,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     // SETUP GYES STUFF
     // ***
     //var socketURI = 'ws://0.0.0.0:26060';
-    var socketURI = 'ws://plusultra-dk5.rhcloud.com:8080/';
+    var socketURI = 'ws://plusultra-148603.sae1.nitrousbox.com:8080/';
     var options ={
       // transports: ['websocket'],
       'force new connection': true,
@@ -130,11 +131,16 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     _fission = new gyes.Fission();
     // listen for interpretation to happen
 
+    // Interaction elements
     var gestElem = doc.querySelector('.data-indicator');
     var gestName = doc.querySelector('.data-label');
+    var gestNameAll = doc.querySelectorAll('.data-label');
     var gestData = doc.querySelector('.gesture-data');
     var gestDataText = gestData.querySelector( 'h3' );
     var fussionEl;
+    var itemOff;
+    var itemOn;
+
     _fusion.on( 'fusion::onSignal', function(data){
       console.log('doing fusion');
       gestName.textContent = '';
@@ -143,17 +149,29 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       gestElem.classList.add( 'highlight' );
 
       fussionEl = doc.getElementById( data.elementID );
-      fussionEl.classList.add( 'onDropZone' );
+
+      /*if ( fussionEl ){
+        fussionEl.classList.add( 'onDropZone' );
+      }*/
+
       setTimeout(function(){
         gestElem.classList.remove( 'highlight' );
-        fussionEl.classList.remove( 'onDropZone' );
+
         gestName.textContent = '';
       }, 2000);
+
     });
 
     _fission.on( _gestureInterpretation.getName(), function(data){
       console.log( 'A new interpretation happened: ', data );
-      gestName.textContent = '';
+      for ( var j=0; j<gestNameAll.length; j++ ){
+        gestNameAll[ j ].textContent = '';
+      }
+
+      if ( fussionEl ){
+
+      }
+
       gestElem.classList.remove( 'highlight' );
       gestDataText.classList.remove( 'invisible' );
       gestDataText.textContent = 'FISION';
@@ -164,7 +182,6 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
         gestDataText.textContent = '';
       }, 2000);
     });
-
   }
 
   // ***
