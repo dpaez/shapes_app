@@ -7,6 +7,8 @@ var express = require('express');
 var jade = require('jade');
 var stylus = require('stylus');
 var nib = require('nib');
+var io = require('socket.io');
+var http = require('http');
 
 /**
  * Module locals
@@ -14,6 +16,8 @@ var nib = require('nib');
  */
 var app = express();
 var pub = __dirname + '/public';
+var server = http.server( app )
+var sio;
 
 /**
  * Module setup
@@ -47,4 +51,18 @@ if ( app.env === 'development' ){
   });
 }
 
-app.listen(3000, '0.0.0.0');
+/**
+ * Module Socket.io events
+ */
+
+sio = io(server);
+  //sio.set('transports', ['websocket']);
+  sio.sockets.on('connection', function( socket ){
+
+  socket.on('data', function( msg ){
+    socket.broadcast.emit( 'message', msg );
+  });
+});
+
+
+server.listen(3000, '0.0.0.0');

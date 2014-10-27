@@ -13,11 +13,14 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     _client,
     _fission,
     _fusion,
-    elem;
-
+    elem,
+    socket;
 
   function _init(){
-    console.log( 'INITIALIAZING SHAPES APP...' );
+    console.info( 'INITIALIAZING SHAPES APP...' );
+
+    socket = io.connect('ws://shapes-dk5.rhcloud.com:8000');
+
     // *** Set up interactive.js ***
     interactive.draggables( '.draggable' );
     interactive.droppables( '.droppable', { 'accept':'.draggable' } );
@@ -29,31 +32,40 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     });
 
     var fingerDraggable = doc.querySelector( '.draggable' ).parentElement;
-    doc.addEventListener( 'fingermove', function( ev ){
-      var target = ev.target;
-      var min = Math.min;
-      var max = Math.max;
-      console.info( 'fingermove::ev ', ev );
+
+    // TODO: move me to interactive.js
+    var updatePosition = function( id, posx, posy ){
+      if ( !id ){ return; } 
+      var target = doc.getElementById( id );
+      var dx, dy;
+
       if ( !target || !target.classList.contains('draggable') ){
         return;
       }
 
-      if ( ev.detail ){
-        ev.dx = parseInt( ev.detail.dx ) - target.offsetLeft;
-        ev.dy = parseInt( ev.detail.dy ) - target.offsetTop;
-      }
+      dx = parseInt( posx ) - target.offsetLeft;
+      dy = parseInt( posy ) - target.offsetTop;
 
       //target.x = (( target.x|0 ) + ev.dx );
-      target.x = ev.dx - (22*4);
+      target.x = dx - (22*4);
 
       //target.y = (( target.y|0 ) + ev.dy );
-      target.y = ev.dy - (22*4);
+      target.y = dy - (22*4);
 
       target.style.top = target.y + 'px';
       target.style.left = target.x + 'px';
 
       target.style.webkitTransform = target.style.transform =
       'translate(' + target.x + 'px, ' + target.y + 'px)';
+    };
+
+    doc.addEventListener( 'fingermove', function( ev ){
+      updatePosition( ev.target.id, ev.detail.dx, ev.detail.dy );
+      socket.emit( 'data', {id:ev.target.id, posx:ev.detail.dx, posy:ev.detail.dy} );
+    });
+
+    sock.on('message', function( msg ){
+      updatePosition( msg.id, msg.posx, msg.posy );
     });
 
     var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
@@ -166,10 +178,6 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       console.log( 'A new interpretation happened: ', data );
       for ( var j=0; j<gestNameAll.length; j++ ){
         gestNameAll[ j ].textContent = '';
-      }
-
-      if ( fussionEl ){
-
       }
 
       gestElem.classList.remove( 'highlight' );
