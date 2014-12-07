@@ -105,14 +105,15 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
           target.classList.remove( 'match' );
         }, 2000);
       }
-      src.classList.add( 'onDropZone' );
+
+      //src.classList.add( 'onDropZone' );
       target.classList.add( 'onDropZone' );
     });
 
     fingerDroppable.addEventListener( 'fingerleave', function( ev ){
       var target = ev.target;
       var src = ev.detail.src;
-      src.classList.add( 'onDropZone' );
+      //src.classList.remove( 'onDropZone' );
       target.classList.remove( 'onDropZone' );
     });
 
