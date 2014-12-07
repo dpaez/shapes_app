@@ -16,7 +16,7 @@ var http = require('http');
  */
 var app = express();
 var pub = __dirname + '/public';
-var server = http.server( app )
+var server = http.createServer( app );
 var sio;
 
 /**

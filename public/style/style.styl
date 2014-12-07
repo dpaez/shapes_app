@@ -275,7 +275,7 @@ body
  * InteractiveApp styles
  */
 
-.onDropZone, .onDropZone:before, .onDropZone:active
+#shapes .onDropZone, #shapes .onDropZone:before, #shapes .onDropZone:active
   opacity: 1
   background-color: purple
 
@@ -303,7 +303,11 @@ body
   #shapes
     width: 100%
     height: 98%
-    left: -2%
+    margin: 0
+    left: 0
+    right: 0
+    bottom: 0
+    top: 0
 
   #forms
     height: 98%
@@ -328,9 +332,19 @@ body
     right: 0
     bottom: 0
     top: 0
+    z-index: 100
+
+  .item-off
+    z-index: 100
+
+  .item
+    z-index: 1
 
   .itemlist > div
     font-size: 6em
     width: 1em
     margin-bottom: 15px
     text-align: center
+
+  #forms
+    z-index: 1

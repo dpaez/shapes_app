@@ -35,7 +35,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
     // TODO: move me to interactive.js
     var updatePosition = function( id, posx, posy ){
-      if ( !id ){ return; } 
+      if ( !id ){ return; }
       var target = doc.getElementById( id );
       var dx, dy;
 
@@ -46,11 +46,18 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       dx = parseInt( posx ) - target.offsetLeft;
       dy = parseInt( posy ) - target.offsetTop;
 
-      //target.x = (( target.x|0 ) + ev.dx );
-      target.x = dx - (22*4);
+      var bodyWidth = doc.body.clientWidth;
+      if ( bodyWidth >= 800 ){
+        //target.x = (( target.x|0 ) + ev.dx );
+        target.x = dx - (88);
 
-      //target.y = (( target.y|0 ) + ev.dy );
-      target.y = dy - (22*4);
+        //target.y = (( target.y|0 ) + ev.dy );
+        target.y = dy - (88);
+      } else {
+
+        target.x = dx - 56;
+        target.y = dy - 56;
+      }
 
       target.style.top = target.y + 'px';
       target.style.left = target.x + 'px';
@@ -60,12 +67,32 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     };
 
     doc.addEventListener( 'fingermove', function( ev ){
-      updatePosition( ev.target.id, ev.detail.dx, ev.detail.dy );
-      socket.emit( 'data', {id:ev.target.id, posx:ev.detail.dx, posy:ev.detail.dy} );
+      var posx = ev.detail.dx,
+       posy = ev.detail.dy,
+       id = ev.target.id,
+       originalW, originalH,
+       over;
+
+      updatePosition( id, posx, posy );
+      over = doc.elementFromPoint(posx, posy - (ev.target.clientWidth /2 + 1));
+
+      if ( over && (over.classList.contains( 'home' ) || over.id === 'shapes') ){
+        originalW = doc.getElementById( 'shapes' ).clientWidth + ev.target.clientWidth + 88;
+        originalH = doc.getElementById( 'shapes' ).clientHeight + ev.target.clientHeight + 88;
+        socket.emit( 'data', {id:id, posx:posx, posy:posy, w:originalW, h:originalH} );
+      }
     });
 
-    sock.on('message', function( msg ){
-      updatePosition( msg.id, msg.posx, msg.posy );
+    socket.on('message', function( msg ){
+
+      var shapesW,shapesH,scaleW,scaleH;
+
+      shapesW = doc.getElementById( 'shapes' ).clientWidth;
+      shapesH = doc.getElementById( 'shapes' ).clientHeight;
+      scaleW = shapesW/msg.w;
+      scaleH = shapesH/msg.h;
+
+      updatePosition( msg.id, msg.posx * scaleW, msg.posy * scaleH);
     });
 
     var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
@@ -78,12 +105,14 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
           target.classList.remove( 'match' );
         }, 2000);
       }
+      src.classList.add( 'onDropZone' );
       target.classList.add( 'onDropZone' );
     });
 
     fingerDroppable.addEventListener( 'fingerleave', function( ev ){
       var target = ev.target;
-
+      var src = ev.detail.src;
+      src.classList.add( 'onDropZone' );
       target.classList.remove( 'onDropZone' );
     });
 
@@ -92,7 +121,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     // ***
     //var socketURI = 'ws://0.0.0.0:26060';
     var socketURI = 'ws://plusultra-148603.sae1.nitrousbox.com:8080/';
-    var options ={
+    var options = {
       // transports: ['websocket'],
       'force new connection': true,
       'forceNew': true
@@ -120,7 +149,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var hapticMod = new gyes.Modality( 'webHaptic', 'both', {} );
     var driverOptions = {
       'hapticEvents': [ 'touch, hold' ],
-      'element': doc.getElementById('shapes')//'.droppable'
+      'element': doc.querySelector('.onDropZone')//'.droppable'
     };
 
     var hapticDriver = new HapticMD( driverOptions );
@@ -141,7 +170,6 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     _fusion.fuse( _gestureInterpretation );
     // create a fission module
     _fission = new gyes.Fission();
-    // listen for interpretation to happen
 
     // Interaction elements
     var gestElem = doc.querySelector('.data-indicator');
@@ -153,6 +181,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var itemOff;
     var itemOn;
 
+    // listen for interpretation to happen
     _fusion.on( 'fusion::onSignal', function(data){
       console.log('doing fusion');
       gestName.textContent = '';
