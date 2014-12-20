@@ -102,10 +102,9 @@ body
   margin-left: auto
   margin-right: auto
   width: 1em
-  height: 1em
-  margin-bottom: 5%
-  line-height: 1em
-
+  height: 30%
+  /*margin-bottom: 5%
+  line-height: 1em*/
 
 .item
   color: #4dc668 //#1650EE
@@ -119,9 +118,19 @@ body
   border-style: solid
   border-radius: 20px
   transition: all 300ms
+  margin-bottom: 5px
+
+.item-match
+  color: #4dc668 //#5C3230 //#57c5b7 //#CFD4EB
+  text-shadow: 0px 1px 0px #5ecb77, 0px 2px 0px #70d186
+  border-width: 2px
+  border-style: solid
+  border-radius: 20px
+  transition: all 300ms
+
 
 .itemlist div:first-child
-  margin-top: 8%
+  margin-top: 5%
 
 .itemlist div:last-child
   margin-bottom: 0
@@ -286,19 +295,30 @@ body
 
 @media (max-width: 960px)
   .itemlist > div
-    font-size: 9em
+    font-size: 10em
     width: 1em
+
+  .itemlist div:first-child
+    margin-top: 25%
 
 
 @media handheld, (max-width: 750px)
   body
-    overflow-x: hidden
+    overflow: hidden
+
+  .itemlist .home
+    position: absolute
+    width: 100%
+    height: 100%
 
   .itemlist > div
-    font-size: 7em
     width: 1em
-    margin-bottom: 5px
     text-align: center
+    height: initial
+    font-size: 8em
+
+  .itemlist div:first-child
+    margin-top: 5%
 
   #shapes
     width: 100%
@@ -308,12 +328,12 @@ body
     right: 0
     bottom: 0
     top: 0
+    position: absolute
 
   #forms
     height: 98%
     left: -60%
     right: 100%
-
 
   .lightbox
     display: none
@@ -321,8 +341,7 @@ body
 
 @media handheld, (max-height: 480px)
   body
-    overflow-x: hidden
-    overflow-y: hidden
+    overflow: hidden
 
   #shapes
     width: 100%
@@ -343,7 +362,7 @@ body
   .itemlist > div
     font-size: 6em
     width: 1em
-    margin-bottom: 15px
+    margin-bottom: 5%
     text-align: center
 
   #forms

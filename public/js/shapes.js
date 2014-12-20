@@ -16,7 +16,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     elem,
     socket;
 
-  function _init(){
+  function _init (){
     console.info( 'INITIALIAZING SHAPES APP...' );
 
     socket = io.connect('ws://shapes-dk5.rhcloud.com:8000');
@@ -38,25 +38,22 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       if ( !id ){ return; }
       var target = doc.getElementById( id );
       var dx, dy;
-
-      if ( !target || !target.classList.contains('draggable') ){
+      console.log( 'updatePosition: ', target )
+      if ( !target || !target.classList.contains('item') ){
         return;
       }
 
       dx = parseInt( posx ) - target.offsetLeft;
       dy = parseInt( posy ) - target.offsetTop;
 
-      var bodyWidth = doc.body.clientWidth;
+      var bodyWidth = $( doc ).width();
       if ( bodyWidth >= 800 ){
-        //target.x = (( target.x|0 ) + ev.dx );
-        target.x = dx - (88);
-
-        //target.y = (( target.y|0 ) + ev.dy );
-        target.y = dy - (88);
+        target.x = dx - 88;
+        target.y = dy - 88;
       } else {
 
-        target.x = dx - 56;
-        target.y = dy - 56;
+        target.x = dx - 98;
+        target.y = dy - 98;
       }
 
       target.style.top = target.y + 'px';
@@ -66,54 +63,89 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       'translate(' + target.x + 'px, ' + target.y + 'px)';
     };
 
+    function matchLetter ( element ){
+      element.classList.add( 'match' );
+      element.setAttribute( 'matched', true );
+      setTimeout(function(){
+        element.classList.remove( 'match' );
+        element.setAttribute( 'matched', false );
+      }, 2000);
+    };
+
+    function matchLocked (){
+      var draggedEl, homeEl;
+
+      homeEl = $( 'div[matched=true]' );
+      if ( homeEl && homeEl.length ){
+        homeEl = homeEl[ 0 ];
+        var draggables = doc.querySelectorAll( '.item' );
+        for (var i = draggables.length - 1; i >= 0; i--) {
+          if ( draggables[ i ] && draggables[ i ].innerText === homeEl.innerText ){
+            draggedEl = draggables[ i ];
+            break;
+          }
+        };
+        if ( draggedEl ){
+          draggedEl.classList.add( 'item-match' );
+        }
+        homeEl.parentElement.removeChild( homeEl );
+      }
+
+    };
+
     doc.addEventListener( 'fingermove', function( ev ){
       var posx = ev.detail.dx,
        posy = ev.detail.dy,
-       id = ev.target.id,
+       //id = ev.target.id,
+       id = ev.detail.src.id,
        originalW, originalH,
-       over;
+       over, target;
 
       updatePosition( id, posx, posy );
-      over = doc.elementFromPoint(posx, posy - (ev.target.clientWidth /2 + 1));
-
+      target = ev.target;
+      over = doc.elementFromPoint( posx, posy - (target.clientWidth/2 + 1) );
       if ( over && (over.classList.contains( 'home' ) || over.id === 'shapes') ){
-        originalW = doc.getElementById( 'shapes' ).clientWidth + ev.target.clientWidth + 88;
-        originalH = doc.getElementById( 'shapes' ).clientHeight + ev.target.clientHeight + 88;
-        socket.emit( 'data', {id:id, posx:posx, posy:posy, w:originalW, h:originalH} );
+        originalW = doc.getElementById( 'shapes' ).clientWidth + target.clientWidth + 88;
+        originalH = doc.getElementById( 'shapes' ).clientHeight + target.clientHeight + 88;
+        socket.emit( 'data', {id:id, action: 'update', posx:posx, posy:posy, w:originalW, h:originalH} );
       }
     });
 
     socket.on('message', function( msg ){
 
+      if ( msg.action === 'match' ){
+        var target = doc.getElementById( msg.id );
+        matchLetter( target );
+        return;
+      }else if ( msg.action === 'lock' ){
+        matchLocked();
+      }
+
       var shapesW,shapesH,scaleW,scaleH;
 
-      shapesW = doc.getElementById( 'shapes' ).clientWidth;
-      shapesH = doc.getElementById( 'shapes' ).clientHeight;
+      shapesW = $( '#shapes' ).innerWidth();
+      shapesH = $( '#shapes' ).innerHeight();
       scaleW = shapesW/msg.w;
       scaleH = shapesH/msg.h;
 
-      updatePosition( msg.id, msg.posx * scaleW, msg.posy * scaleH);
+      updatePosition( msg.id, msg.posx * scaleW , msg.posy * scaleH );
     });
 
     var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
     fingerDroppable.addEventListener( 'fingerenter', function( ev ){
       var target = ev.target;
       var src = ev.detail.src;
-      if ( src.innerText === target.innerText ){
-        target.classList.add( 'match' );
-        setTimeout(function(){
-          target.classList.remove( 'match' );
-        }, 2000);
+      if ( src && target && src.innerText === target.innerText ){
+        matchLetter( target );
+        socket.emit( 'data', {id:target.id, action: 'match'} );
       }
 
-      //src.classList.add( 'onDropZone' );
       target.classList.add( 'onDropZone' );
     });
 
     fingerDroppable.addEventListener( 'fingerleave', function( ev ){
       var target = ev.target;
       var src = ev.detail.src;
-      //src.classList.remove( 'onDropZone' );
       target.classList.remove( 'onDropZone' );
     });
 
@@ -173,10 +205,10 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     _fission = new gyes.Fission();
 
     // Interaction elements
-    var gestElem = doc.querySelector('.data-indicator');
-    var gestName = doc.querySelector('.data-label');
-    var gestNameAll = doc.querySelectorAll('.data-label');
-    var gestData = doc.querySelector('.gesture-data');
+    var gestElem = doc.querySelector( '.data-indicator' );
+    var gestName = doc.querySelector( '.data-label' );
+    var gestNameAll = doc.querySelectorAll( '.data-label' );
+    var gestData = doc.querySelector( '.gesture-data' );
     var gestDataText = gestData.querySelector( 'h3' );
     var fussionEl;
     var itemOff;
@@ -184,21 +216,22 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
     // listen for interpretation to happen
     _fusion.on( 'fusion::onSignal', function(data){
-      console.log('doing fusion');
+      console.log( 'doing fusion' );
       gestName.textContent = '';
       gestElem.classList.remove( 'highlight' );
       gestName.textContent = data.gesture;
       gestElem.classList.add( 'highlight' );
 
       fussionEl = doc.getElementById( data.elementID );
-
-      /*if ( fussionEl ){
+      if ( fussionEl ){
         fussionEl.classList.add( 'onDropZone' );
-      }*/
+      }
 
       setTimeout(function(){
         gestElem.classList.remove( 'highlight' );
-
+        if ( fussionEl ){
+          fussionEl.classList.remove( 'onDropZone' );
+        }
         gestName.textContent = '';
       }, 2000);
 
@@ -209,6 +242,9 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       for ( var j=0; j<gestNameAll.length; j++ ){
         gestNameAll[ j ].textContent = '';
       }
+
+      matchLocked();
+      socket.emit( 'data', {id:'', action: 'lock'} );
 
       gestElem.classList.remove( 'highlight' );
       gestDataText.classList.remove( 'invisible' );
