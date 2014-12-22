@@ -96,8 +96,8 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     doc.addEventListener( 'fingermove', function( ev ){
       var posx = ev.detail.dx,
        posy = ev.detail.dy,
-       //id = ev.target.id,
-       id = ev.detail.src.id,
+       id = ev.target.id,
+       //id = ev.detail.src.id,
        originalW, originalH,
        over, target;
 

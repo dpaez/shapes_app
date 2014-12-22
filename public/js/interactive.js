@@ -12,8 +12,6 @@ var InteractiveApp = (function( interact ){
     target.style.webkitTransform = target.style.transform =
     'translate(' + target.x + 'px, ' + target.y + 'px)';
 
-    console.log( 'x: ', target.x );
-    console.log( 'y: ', target.y );
   }
 
   function defaultDragEnter( event ){

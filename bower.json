@@ -22,7 +22,10 @@
     "tests"
   ],
   "dependencies": {
-    "interact.js": "~1.0.17",
-    "jquery": "~2.1.1"
+    "interact": "*",
+    "jquery": "~2.1.1",
+    "gyes": "git://github.com/dpaez/gyes.git",
+    "airPointerMD": "git://github.com/dpaez/AirPointerDriver.git",
+    "hapticMD": "git://github.com/dpaez/HapticModalityDriver.git"
   }
 }
