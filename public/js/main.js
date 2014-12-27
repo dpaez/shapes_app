@@ -7,8 +7,10 @@
     $( document.body ).height( height );
     //if ( window.matchMedia('handheld, (max-width: 750px)').matches ){
     console.log( 'current height: ', height );
-    $( '.item, .item-off' ).height( height/4 );
-    
+    var letterH = height/4;
+    $( '.item, .item-off' ).height( letterH );
+    $( '.item, .item-off' ).css( 'font-size', letterH );
+    $( '.item, .item-off' ).css( 'line-height', 1 );
     init();
   };
 
@@ -16,7 +18,7 @@
     // init
     app.initialize();
     visor.start();
-    postInit();    
+    postInit();
   };
 
   function postInit(){

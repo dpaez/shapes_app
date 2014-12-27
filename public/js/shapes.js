@@ -14,12 +14,14 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     _fission,
     _fusion,
     elem,
+    src,
     socket;
 
   function _init (){
     console.info( 'INITIALIAZING SHAPES APP...' );
 
-    socket = io.connect('ws://shapes-dk5.rhcloud.com:8000');
+    //socket = io.connect('ws://shapes-dk5.rhcloud.com:8000');
+    socket = io.connect();
 
     // *** Set up interactive.js ***
     interactive.draggables( '.draggable' );
@@ -102,6 +104,8 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
        over, target;
 
       updatePosition( id, posx, posy );
+      src = doc.getElementById( id ); // update src
+
       target = ev.target;
       over = doc.elementFromPoint( posx, posy - (target.clientWidth/2 + 1) );
       if ( over && (over.classList.contains( 'home' ) || over.id === 'shapes') ){
@@ -134,10 +138,11 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
     fingerDroppable.addEventListener( 'fingerenter', function( ev ){
       var target = ev.target;
-      var src = ev.detail.src;
+
       if ( src && target && src.innerText === target.innerText ){
         matchLetter( target );
-        socket.emit( 'data', {id:target.id, action: 'match'} );
+        console.log( 'matchLetter - ', src.id )
+        socket.emit( 'data', {id:src.id, action: 'match'} );
       }
 
       target.classList.add( 'onDropZone' );
@@ -190,7 +195,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     _client.addModality( app_key, hapticMod );
 
     // ***
-    // Interpretation, Fusion & the Fission
+    // Interpretation, Fusion & Fission
     // ***
 
     // fingerover is the modality signal that is dispatched through the (Leap) AirGestures

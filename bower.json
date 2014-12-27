@@ -22,7 +22,7 @@
     "tests"
   ],
   "dependencies": {
-    "interact": "*",
+    "interact": "latest",
     "jquery": "~2.1.1",
     "gyes": "git://github.com/dpaez/gyes.git",
     "airPointerMD": "git://github.com/dpaez/AirPointerDriver.git",
