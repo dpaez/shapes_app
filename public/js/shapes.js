@@ -2,7 +2,7 @@
  * File: shapes.js
  * Deps: Gyes, DOM, HapticModuleDriver
  *
- * Description: A "mini" game multimodality demo app.
+ * Description: A proof-of-concept multimodality game, built using plusultra engine.
  */
 
 var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
@@ -53,7 +53,6 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
         target.x = dx - 88;
         target.y = dy - 88;
       } else {
-
         target.x = dx - 98;
         target.y = dy - 98;
       }
@@ -67,30 +66,35 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
     function matchLetter ( element ){
       element.classList.add( 'match' );
-      element.setAttribute( 'matched', true );
-      setTimeout(function(){
+      //element.setAttribute( 'matched', true );
+      setTimeout( function () {
         element.classList.remove( 'match' );
-        element.setAttribute( 'matched', false );
-      }, 2000);
+        //element.setAttribute( 'matched', false );
+      }, 2500);
     };
 
     function matchLocked (){
-      var draggedEl, homeEl;
+      var draggedEl, droppedEl, draggables;
 
-      homeEl = $( 'div[matched=true]' );
-      if ( homeEl && homeEl.length ){
-        homeEl = homeEl[ 0 ];
-        var draggables = doc.querySelectorAll( '.item' );
-        for (var i = draggables.length - 1; i >= 0; i--) {
-          if ( draggables[ i ] && draggables[ i ].innerText === homeEl.innerText ){
-            draggedEl = draggables[ i ];
+      droppedEl = $( '.match' );
+      if ( droppedEl && droppedEl.length ){
+        //droppedEl = droppedEl[ 0 ];
+        draggables = $( '.item' );
+        for ( var i = 0; i < draggables.length; i++ ) {
+          
+          draggedEl = $( draggables[i] );
+          if ( draggedEl && draggedEl.text() === droppedEl.text() ){
             break;
           }
+          
         };
-        if ( draggedEl ){
-          draggedEl.classList.add( 'item-match' );
+
+        console.log( 'droppedEl: ', droppedEl );
+        console.log( 'draggedEl: ', draggedEl );
+        if (draggedEl){
+          draggedEl.hide();
         }
-        homeEl.parentElement.removeChild( homeEl );
+        droppedEl.addClass( 'item-match' );
       }
 
     };
@@ -104,7 +108,9 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
        over, target;
 
       updatePosition( id, posx, posy );
-      src = doc.getElementById( id ); // update src
+      if ( id ){
+        src = doc.getElementById( id ); // update src
+      }
 
       target = ev.target;
       over = doc.elementFromPoint( posx, posy - (target.clientWidth/2 + 1) );
@@ -141,11 +147,10 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
       if ( src && target && src.innerText === target.innerText ){
         matchLetter( target );
-        console.log( 'matchLetter - ', src.id )
-        socket.emit( 'data', {id:src.id, action: 'match'} );
+        socket.emit( 'data', {id:target.id, action: 'match'} );
       }
-
       target.classList.add( 'onDropZone' );
+
     });
 
     fingerDroppable.addEventListener( 'fingerleave', function( ev ){
