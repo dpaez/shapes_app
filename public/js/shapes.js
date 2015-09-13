@@ -20,8 +20,8 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
   function _init (){
     console.info( 'INITIALIAZING SHAPES APP...' );
 
-    //socket = io.connect('ws://shapes-dk5.rhcloud.com:8000');
-    socket = io.connect();
+    socket = io.connect('ws://shapes-app.geutstudio.com:8000');
+    //socket = io.connect();
 
     // *** Set up interactive.js ***
     interactive.draggables( '.draggable' );
@@ -162,8 +162,8 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     // ***
     // SETUP GYES STUFF
     // ***
-    //var socketURI = 'ws://0.0.0.0:26060';
-    var socketURI = 'ws://plusultra-148603.sae1.nitrousbox.com:8080/';
+    //var socketURI = 'ws://localhost:26060';
+    var socketURI = 'ws://plusultra.geutstudio.com';
     var options = {
       // transports: ['websocket'],
       'force new connection': true,
