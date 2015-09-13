@@ -33,11 +33,11 @@ var InteractiveApp = (function( interact ){
 
     interact( elements )
       .draggable({
+        inertia: true,
         onstart: onDragStartFn,
         onmove: onDragMoveFn,
         onend: onDragEndFn
       })
-      .inertia(true);
   }
 
   function setDrops( elements, options ){
