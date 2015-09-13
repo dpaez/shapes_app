@@ -161,8 +161,6 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
     // ***
     // SETUP GYES STUFF
-    // ***
-    //var socketURI = 'ws://localhost:26060';
     var socketURI = 'ws://plusultra.geutstudio.com';
     var options = {
       // transports: ['websocket'],
