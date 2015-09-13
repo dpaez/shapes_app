@@ -20,7 +20,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
   function _init (){
     console.info( 'INITIALIAZING SHAPES APP...' );
 
-    socket = io.connect('ws://shapes-app.geutstudio.com:8000');
+    socket = io.connect('ws://shapes-app.geutstudio.com');
     //socket = io.connect();
 
     // *** Set up interactive.js ***
