@@ -14,9 +14,9 @@ var http = require('http');
  * Module locals
  *
  */
-var app = express();
+var app = require('express')();
+var server = require('http').Server(app);
 var pub = __dirname + '/public';
-var server = http.createServer( app );
 var sio;
 
 /**
@@ -51,6 +51,8 @@ if ( app.env === 'development' ){
   });
 }
 
+server.listen(9290, 'localhost');
+
 /**
  * Module Socket.io events
  */
@@ -63,6 +65,3 @@ sio = io(server);
     socket.broadcast.emit( 'message', msg );
   });
 });
-
-
-server.listen(9290, 'localhost');
