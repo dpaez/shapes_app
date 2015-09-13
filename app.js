@@ -65,4 +65,4 @@ sio = io(server);
 });
 
 
-server.listen(3000, 'localhost');
+server.listen(9290, 'localhost');
