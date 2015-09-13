@@ -20,8 +20,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
   function _init (){
     console.info( 'INITIALIAZING SHAPES APP...' );
 
-    //socket = io.connect('ws://shapes-dk5.rhcloud.com:8000');
-    socket = io.connect();
+    socket = io.connect('ws://shapes-app.geutstudio.com');
 
     // *** Set up interactive.js ***
     interactive.draggables( '.draggable' );
