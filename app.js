@@ -57,11 +57,11 @@ server.listen(9290, 'localhost');
  * Module Socket.io events
  */
 
-sio = io(server);
-  //sio.set('transports', ['websocket']);
-  sio.sockets.on('connection', function( socket ){
+sio = io(server)
+  //.set('transports', ['websocket'])
+  .sockets.on('connection', function( socket ){
 
-  socket.on('data', function( msg ){
-    socket.broadcast.emit( 'message', msg );
+    socket.on('data', function( msg ){
+      socket.broadcast.emit( 'message', msg );
+    });
   });
-});
