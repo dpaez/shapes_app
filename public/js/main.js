@@ -15,7 +15,7 @@
   };
 
   function init (){
-    // init
+    // init all the modules
     app.initialize();
     visor.start();
     postInit();
