@@ -20,7 +20,8 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
   function _init (){
     console.info( 'INITIALIAZING SHAPES APP...' );
 
-    socket = io.connect('ws://shapes-app.geutstudio.com');
+    // socket = io.connect('ws://shapes-app.geutstudio.com');
+    socket = io.connect();
 
     // *** Set up interactive.js ***
     interactive.draggables( '.draggable' );
@@ -160,13 +161,13 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
     // ***
     // SETUP GYES STUFF
-    var socketURI = 'ws://plusultra.geutstudio.com';
+    var socketURI = 'ws://plusultra.geutstudio.com:80';
     var options = {
       // transports: ['websocket'],
       'force new connection': true,
       'forceNew': true
     };
-    var app_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJpYXQiOjEzOTc0MjAzMDJ9.YPN191cpYko9Q_-9AtrOCwGBT6FQU---EduJTJki4zM';
+    var app_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoidGVzdCIsInNjb3BlcyI6WyJtZWRpdW0iXSwiaWF0IjoxNDQzMjgzMTQzfQ.DcIqzxDbFrjP-lTO_8G5g-SncRxwRcYbaPuajgJtHbI';
     _client = new gyes( app_key, socketURI, options );
 
     _client.authenticate( app_key );
