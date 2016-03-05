@@ -15,10 +15,13 @@
   "author": "Diego Paez",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.13.3",
+    "hapi": "^13.0.0",
+    "hapi-stylus": "^2.1.0",
+    "inert": "^3.2.0",
     "jade": "^1.11.0",
     "nib": "^1.1.0",
     "socket.io": "^1.3.6",
-    "stylus": "^0.44.0"
+    "stylus": "^0.44.0",
+    "vision": "^4.0.1"
   }
 }
