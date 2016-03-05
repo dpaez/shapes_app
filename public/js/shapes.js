@@ -64,13 +64,17 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       'translate(' + target.x + 'px, ' + target.y + 'px)';
     };
 
-    function matchLetter ( element ){
-      element.classList.add( 'match' );
-      //element.setAttribute( 'matched', true );
-      setTimeout( function () {
-        element.classList.remove( 'match' );
-        //element.setAttribute( 'matched', false );
-      }, 2500);
+    function matchLetter ( target, src ){
+      if ( src && target && src.innerText === target.innerText ){
+          target.classList.add( 'match' );
+          //target.setAttribute( 'matched', true );
+          setTimeout( function () {
+              target.classList.remove( 'match' );
+              //target.setAttribute( 'matched', false );
+          }, 2500);
+          return true;
+      }
+      return false;
     };
 
     function matchLocked (){
@@ -81,12 +85,12 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
         //droppedEl = droppedEl[ 0 ];
         draggables = $( '.item' );
         for ( var i = 0; i < draggables.length; i++ ) {
-          
+
           draggedEl = $( draggables[i] );
           if ( draggedEl && draggedEl.text() === droppedEl.text() ){
             break;
           }
-          
+
         };
 
         console.log( 'droppedEl: ', droppedEl );
@@ -95,6 +99,10 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
           draggedEl.hide();
         }
         droppedEl.addClass( 'item-match' );
+        // TODO: check this, edit stylesheet in order to
+        // avoid dependecy on item-off class for Positioning
+        // also consider to add a different set of class for draggable
+        droppedEl.removeClass('item-off');
       }
 
     };
@@ -114,7 +122,9 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
       target = ev.target;
       over = doc.elementFromPoint( posx, posy - (target.clientWidth/2 + 1) );
-      if ( over && (over.classList.contains( 'home' ) || over.id === 'shapes') ){
+      if ( over &&
+         ( over.classList.contains( 'home' ) || over.id === 'shapes' ) &&
+         ( !over.classList.contains( 'item-match' ) ) ){
         originalW = doc.getElementById( 'shapes' ).clientWidth + target.clientWidth + 88;
         originalH = doc.getElementById( 'shapes' ).clientHeight + target.clientHeight + 88;
         socket.emit( 'data', {id:id, action: 'update', posx:posx, posy:posy, w:originalW, h:originalH} );
@@ -144,12 +154,10 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
     fingerDroppable.addEventListener( 'fingerenter', function( ev ){
       var target = ev.target;
-
-      if ( src && target && src.innerText === target.innerText ){
-        matchLetter( target );
+      if ( matchLetter( target, src ) ){
         socket.emit( 'data', {id:target.id, action: 'match'} );
-      }
-      target.classList.add( 'onDropZone' );
+        target.classList.add( 'onDropZone' );
+      };
 
     });
 
@@ -221,47 +229,61 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var fussionEl;
     var itemOff;
     var itemOn;
-
+    // TODO: remove onDropZone class
     // listen for interpretation to happen
     _fusion.on( 'fusion::onSignal', function(data){
-      console.log( 'doing fusion' );
+      console.log( 'doing fusion with data', data );
       gestName.textContent = '';
+      gestElem.classList.remove( 'invisible' );
       gestElem.classList.remove( 'highlight' );
       gestName.textContent = data.gesture;
       gestElem.classList.add( 'highlight' );
 
       fussionEl = doc.getElementById( data.elementID );
       if ( fussionEl ){
+        var _itemsOff = document.querySelectorAll( '.item-off' );
+        // clean previously added dropzones
+        var item;
+        for ( var i = 0; i < _itemsOff.length; i++ ){
+            item = _itemsOff[ i ];
+            item.classList.remove( 'onDropZone' );
+        }
+        item = null;
         fussionEl.classList.add( 'onDropZone' );
       }
 
-      setTimeout(function(){
-        gestElem.classList.remove( 'highlight' );
-        if ( fussionEl ){
-          fussionEl.classList.remove( 'onDropZone' );
-        }
-        gestName.textContent = '';
-      }, 2000);
+    setTimeout(function(){
+            gestElem.classList.remove( 'highlight' );
+            if ( fussionEl ){
+              fussionEl.classList.remove( 'onDropZone' );
+            }
+            gestName.textContent = null;
+    }, 1500);
 
     });
 
     _fission.on( _gestureInterpretation.getName(), function(data){
       console.log( 'A new interpretation happened: ', data );
-      for ( var j=0; j<gestNameAll.length; j++ ){
-        gestNameAll[ j ].textContent = '';
-      }
+    //   for ( var j=0; j<gestNameAll.length; j++ ){
+    //     gestNameAll[ j ].textContent = '';
+    //   }
 
       matchLocked();
       socket.emit( 'data', {id:'', action: 'lock'} );
 
+
       gestElem.classList.remove( 'highlight' );
+      gestElem.classList.add( 'invisible' );
       gestDataText.classList.remove( 'invisible' );
       gestDataText.textContent = 'FISION';
       gestData.classList.add( 'highlight' );
+      gestElem.classList.add( 'invisible' );
+
       setTimeout(function(){
         gestDataText.classList.add( 'invisible' );
         gestData.classList.remove( 'highlight' );
         gestDataText.textContent = '';
+        gestName.textContent = '';
       }, 2000);
     });
   }
