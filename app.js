@@ -1,21 +1,34 @@
+'use strict';
 /**
  * Module dependencies
  *
  */
 
-var express = require('express');
-var jade = require('jade');
-var stylus = require('stylus');
-var nib = require('nib');
-var io = require('socket.io');
-var http = require('http');
+const Path = require('path');
+const Hapi = require('hapi');
+const jade = require('jade');
+const stylus = require('stylus');
+const nib = require('nib');
+const http = require('http');
+const io = require('socket.io');
+
+
+
+
 
 /**
  * Module locals
  *
  */
-var app = require('express')();
-var server = require('http').Server(app);
+const server = new Hapi.Server({
+    connections: {
+        routes: {
+            files: {
+                relativeTo: Path.join(__dirname, 'public')
+            }
+        }
+    }
+});
 var pub = __dirname + '/public';
 var sio;
 
@@ -23,45 +36,96 @@ var sio;
  * Module setup
  */
 
-function compile(str, path){
-  return stylus(str)
-  .set('filename', path)
-  .set('compress', true)
-  .use(nib());
-}
+const plugins = [
+    {
+        register: require( 'vision' ),
+        options: {}
+    },
+    {
+        register: require('inert'),
+        options: {}
+    },
+    {
+        register: require( 'hapi-stylus' ),
+        options: {
+            home: __dirname + "/public/style",
+            route: __dirname + "/public/style/{filename*}",
+            use: [nib]
+        }
+    }
+];
 
-app.use( stylus.middleware({
-  src: pub,
-  compile: compile
-}));
-app.set('view engine', 'jade');
-app.use( express.static(pub) );
+server.connection( { port: 9290 } );
+server.register(plugins, (err) => {
 
-/**
- * Module routes
- */
-
-app.get('/', function(req, res){
-  res.render( 'shapes', {'title':'Shapes App'} );
-});
-
-if ( app.env === 'development' ){
-  app.use(function(err, req, res, next) {
-    res.send( err.stack );
-  });
-}
-
-server.listen(9290, 'localhost');
-
-/**
- * Module Socket.io events
- */
-
-sio = io(server)
-  //.set('transports', ['websocket'])
-  .sockets.on('connection', function( socket ){
-
-    socket.on('data', function( msg ){
-      socket.broadcast.emit( 'message', msg );
+    if (err) {
+        throw err;
+    }
+    server.views({
+        engines: { jade: require('jade') },
+        path: __dirname + '/views',
+        compileOptions: {
+            pretty: true
+        }
     });
-  });
+
+    server.route( {
+        method: 'GET',
+        path: '/',
+        handler: function (request, reply) {
+            reply.view( 'shapes', {'title':'Shapes App'} );
+        }
+    } );
+
+    // static files route
+    server.route( {
+        method: 'GET',
+        path: '/style/{param*}',
+        handler: {
+            directory: {
+                path: 'style',
+                listing: true
+            }
+        }
+    } );
+
+    server.route( {
+        method: 'GET',
+        path: '/js/{param*}',
+        handler: {
+            directory: {
+                path: 'js'
+            }
+        }
+    } );
+
+
+    server.route( {
+        method: 'GET',
+        path: '/vendor/{param*}',
+        handler: {
+            directory: {
+                path: 'vendor'
+            }
+        }
+    } );
+
+
+    /**
+    * Module Socket.io events
+    */
+
+    sio = io(server.listener)
+    //.set('transports', ['websocket'])
+    .sockets.on('connection', function( socket ){
+
+        socket.on('data', function( msg ){
+            socket.broadcast.emit( 'message', msg );
+        });
+    });
+    server.start( () => {
+        console.log( 'Hapi :D Server running at: %s',
+        server.info.uri );
+    } );
+
+});
