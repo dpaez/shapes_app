@@ -16,11 +16,13 @@ var InteractiveApp = (function( interact ){
 
   function defaultDragEnter( event ){
     var target = event.target;
+    console.log('defaultDragEnter::target', target)
     target.classList.add( 'onDropZone' );
   }
 
   function defaultDragLeave( event ){
     var target = event.target;
+    console.log('defaultDragLeave::target', target)
     target.classList.remove( 'onDropZone' );
   }
 
@@ -46,13 +48,29 @@ var InteractiveApp = (function( interact ){
     var onDragEnterFn = options.onDragEnterFn || defaultDragEnter;
     var onDragLeaveFn = options.onDragLeaveFn || defaultDragLeave;
     var onDropFn = options.onDropFn || undefined;
-    var accepts = options.accept || '.draggable';
+    var accepts = options.accept || { accept: '.draggable' };
+    var iOptions = {
+        accept: '.draggable',
+        overlap: 'center',
+        checker: function (
+            dragEvent,         // related dragmove or dragend
+            event,             // Touch, Pointer or Mouse Event
+            dropped,           // bool default checker result
+            dropzone,          // dropzone Interactable
+            dropElement,       // dropzone elemnt
+            draggable,         // draggable Interactable
+            draggableElement) {// draggable element
+                 // only allow drops into empty dropzone elements
+                 console.log( 'dropElement inner is equal to draggableElement', (dropElement.innerText === draggableElement.innerText))
+                 return dropped && dropElement.innerText === draggableElement.innerText;
+            }
+    };
 
     interact( elements )
-      .dropzone( true )
-      .on( 'dragenter', onDragEnterFn )
-      .on( 'dragleave', onDragLeaveFn )
-      .accept( accepts );
+      .dropzone( iOptions )
+    //   .on( 'dragenter', onDragEnterFn )
+    //   .on( 'dragleave', onDragLeaveFn )
+      //.accept( accepts );
   }
 
   function publicDraggables( elementsList, options ){
