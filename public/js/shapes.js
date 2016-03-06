@@ -6,6 +6,7 @@
  */
 
 var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
+  'use strict';
   // ***
   // Private module implementation
   // ***
@@ -64,18 +65,28 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       'translate(' + target.x + 'px, ' + target.y + 'px)';
     };
 
-    function matchLetter ( target, src ){
-      if ( src && target && src.innerText === target.innerText ){
-          target.classList.add( 'match' );
-          //target.setAttribute( 'matched', true );
-          setTimeout( function () {
-              target.classList.remove( 'match' );
-              //target.setAttribute( 'matched', false );
-          }, 2500);
-          return true;
-      }
-      return false;
-    };
+    // function matchLetter ( target, src, cb ){
+    //   if ( src && target && src.innerText === target.innerText ){
+    //       target.classList.add( 'match' );
+    //       //target.setAttribute( 'matched', true );
+    //       setTimeout( function () {
+    //           target.classList.remove( 'match' );
+    //           //target.setAttribute( 'matched', false );
+    //       }, 3000);
+    //       if ( typeof cb === 'function' ){
+    //           cb();
+    //       }
+    //   }
+    // };
+
+    function matchLetter ( element ){
+        element.classList.add( 'match' );
+        //element.setAttribute( 'matched', true );
+        setTimeout( function () {
+            element.classList.remove( 'match' );
+            //element.setAttribute( 'matched', false );
+        }, 2500);
+    }
 
     function matchLocked (){
       var draggedEl, droppedEl, draggables;
@@ -95,8 +106,9 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
 
         console.log( 'droppedEl: ', droppedEl );
         console.log( 'draggedEl: ', draggedEl );
-        if (draggedEl){
-          draggedEl.hide();
+        if ( draggedEl ){
+          //draggedEl.hide();
+          draggedEl.addClass( 'invisible' );
         }
         droppedEl.addClass( 'item-match' );
         // TODO: check this, edit stylesheet in order to
@@ -127,7 +139,14 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
          ( !over.classList.contains( 'item-match' ) ) ){
         originalW = doc.getElementById( 'shapes' ).clientWidth + target.clientWidth + 88;
         originalH = doc.getElementById( 'shapes' ).clientHeight + target.clientHeight + 88;
-        socket.emit( 'data', {id:id, action: 'update', posx:posx, posy:posy, w:originalW, h:originalH} );
+        socket.emit( 'data', {
+            id:id,
+            action: 'update',
+            posx:posx,
+            posy:posy,
+            w:originalW,
+            h:originalH
+        } );
       }
     });
 
@@ -137,7 +156,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
         var target = doc.getElementById( msg.id );
         matchLetter( target );
         return;
-      }else if ( msg.action === 'lock' ){
+      } else if ( msg.action === 'lock' ){
         matchLocked();
       }
 
@@ -154,11 +173,20 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     var fingerDroppable = doc.querySelector( '.droppable' ).parentElement;
     fingerDroppable.addEventListener( 'fingerenter', function( ev ){
       var target = ev.target;
-      if ( matchLetter( target, src ) ){
-        socket.emit( 'data', {id:target.id, action: 'match'} );
+      if ( src && target && src.innerText === target.innerText ){
+         matchLetter( target );
+    //   matchLetter( target, src, function(){
+    //       socket.emit( 'data', {
+    //           id:target.id,
+    //           action: 'match'
+    //       } );
+    //   } )
+            socket.emit( 'data', {
+              id:target.id,
+              action: 'match'
+            } );
         target.classList.add( 'onDropZone' );
-      };
-
+        }
     });
 
     fingerDroppable.addEventListener( 'fingerleave', function( ev ){
@@ -210,7 +238,7 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     // ***
 
     // fingerover is the modality signal that is dispatched through the (Leap) AirGestures
-    _gestureInterpretation = new gyes.Interpretation( ['fingerover', 'hold'] );
+    var _gestureInterpretation = new gyes.Interpretation( ['fingerover', 'hold'] );
     _gestureInterpretation.canSynthetize( hapticMod.name, hapticDriver.getID(), 2000 );
 
     // create a fusion module
@@ -232,33 +260,35 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
     // TODO: remove onDropZone class
     // listen for interpretation to happen
     _fusion.on( 'fusion::onSignal', function(data){
-      console.log( 'doing fusion with data', data );
-      gestName.textContent = '';
-      gestElem.classList.remove( 'invisible' );
-      gestElem.classList.remove( 'highlight' );
-      gestName.textContent = data.gesture;
-      gestElem.classList.add( 'highlight' );
+        console.log( 'doing fusion with data', data );
+        gestName.textContent = '';
+        gestElem.classList.remove( 'invisible' );
+        gestElem.classList.remove( 'highlight' );
+        gestName.textContent = data.gesture;
+        gestElem.classList.add( 'highlight' );
 
-      fussionEl = doc.getElementById( data.elementID );
-      if ( fussionEl ){
+        fussionEl = doc.getElementById( data.elementID );
         var _itemsOff = document.querySelectorAll( '.item-off' );
         // clean previously added dropzones
         var item;
-        for ( var i = 0; i < _itemsOff.length; i++ ){
-            item = _itemsOff[ i ];
-            item.classList.remove( 'onDropZone' );
+        var iLength = _itemsOff.length;
+        var idx;
+        for ( idx = 0; idx < iLength; idx++ ){
+          item = _itemsOff[ idx ];
+          item.classList.remove( 'onDropZone' );
         }
         item = null;
-        fussionEl.classList.add( 'onDropZone' );
-      }
+        if ( fussionEl ){
+            fussionEl.classList.add( 'onDropZone' );
+        }
 
-    setTimeout(function(){
+        setTimeout(function(){
             gestElem.classList.remove( 'highlight' );
             if ( fussionEl ){
               fussionEl.classList.remove( 'onDropZone' );
             }
             gestName.textContent = null;
-    }, 1500);
+        }, 2000);
 
     });
 
@@ -271,13 +301,11 @@ var ShapesApp = (function( interactive, gyes, doc, HapticMD, AirPointerMD ){
       matchLocked();
       socket.emit( 'data', {id:'', action: 'lock'} );
 
-
       gestElem.classList.remove( 'highlight' );
       gestElem.classList.add( 'invisible' );
       gestDataText.classList.remove( 'invisible' );
       gestDataText.textContent = 'FISION';
       gestData.classList.add( 'highlight' );
-      gestElem.classList.add( 'invisible' );
 
       setTimeout(function(){
         gestDataText.classList.add( 'invisible' );

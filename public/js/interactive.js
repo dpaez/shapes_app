@@ -1,4 +1,5 @@
 var InteractiveApp = (function( interact ){
+  'use strict';
 
 
   function defaultMove( event ){
