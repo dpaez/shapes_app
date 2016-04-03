@@ -49,7 +49,7 @@ const plugins = [
         register: require( 'hapi-stylus' ),
         options: {
             home: __dirname + "/public/style",
-            route: __dirname + "/public/style/{filename*}",
+            route: "/style/{filename*}",
             use: [nib]
         }
     }
@@ -74,18 +74,6 @@ server.register(plugins, (err) => {
         path: '/',
         handler: function (request, reply) {
             reply.view( 'shapes', {'title':'Shapes App'} );
-        }
-    } );
-
-    // static files route
-    server.route( {
-        method: 'GET',
-        path: '/style/{param*}',
-        handler: {
-            directory: {
-                path: 'style',
-                listing: true
-            }
         }
     } );
 
